@@ -1,7 +1,4 @@
 // ignore_for_file: avoid_print
-
-import 'dart:ffi';
-
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -13,6 +10,7 @@ import '../model/cashflow.dart';
 class DBHelper {
   static final DBHelper _instance = DBHelper.internal();
   DBHelper.internal();
+  var totalNominal;
 
   factory DBHelper() => _instance;
 
@@ -118,6 +116,8 @@ class DBHelper {
       return 0;
     }
   }
+
+  
 
   // Future<void> ambilNominal() async {
   //   var dbClient = await db;

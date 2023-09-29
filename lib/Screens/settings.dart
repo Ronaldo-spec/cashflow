@@ -203,6 +203,33 @@ class _settingsState extends State<settings> {
                     const SizedBox(
                       height: 20,
                     ),
+                    Center(
+                      child: Image.asset(
+                        'assets/images/adited.jpg',
+                        width: 120,
+                        height: 170,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const Text(
+                      'Aplikasi ini dibuat oleh: ',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const Text(
+                      'Nama     : Ronaldo Firmansyah \n'
+                      'Nim        : 1941720117 \n'
+                      'Tanggal  : 29 September 2023',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ],
                 ),
               ),

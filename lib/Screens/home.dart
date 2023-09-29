@@ -20,7 +20,22 @@ class _HomeState extends State<Home> {
   var db = DBHelper();
   var formatCurrency = NumberFormat.currency(locale: 'id', symbol: 'Rp. ');
 
+  int _totalIncome = 0;
+  int totalOutcome = 0;
+
+  Future<void> _updateNominal() async {
+    int total = await db.getTotalNominalByType('income');
+    setState(() {
+      _totalIncome = total;
+    });
+  }
+
   @override
+  void initState() {
+    super.initState();
+    _updateNominal();
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -147,13 +162,18 @@ class _HomeState extends State<Home> {
                         children: [
                           InkWell(
                             onTap: () async {
-                              bool tambah = await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => income(),
-                                ),
-                              );
+                              bool tambah = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => income(),
+                                  ));
+                              // bool tambah = await Navigator.of(context).push(
+                              //   MaterialPageRoute(
+                              //     builder: (context) => income(),
+                              //   ),
+                              // );
                               if (tambah == true) {
-                                // _updateIncome();
+                                _updateNominal();
                               }
                             },
                             child: Container(
