@@ -1,16 +1,16 @@
 // ignore_for_file: avoid_print
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'dart:io' as io;
+
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../model/cashflow.dart';
 
 class DBHelper {
   static final DBHelper _instance = DBHelper.internal();
   DBHelper.internal();
-  var totalNominal;
 
   factory DBHelper() => _instance;
 
@@ -24,14 +24,14 @@ class DBHelper {
     return _db;
   }
 
-  setDB() async {
-    io.Directory directory = await getApplicationDocumentsDirectory();
-    String path = join(directory.path, 'myCashbook.db');
-    var db = await openDatabase(path, version: 1, onCreate: _onCreate);
-    return db;
+  Future<Database> setDB() async {
+    final io.Directory directory = await getApplicationDocumentsDirectory();
+    final String path = join(directory.path, 'myCashbook.db');
+    final database = await openDatabase(path, version: 1, onCreate: _onCreate);
+    return database;
   }
 
-  void _onCreate(Database db, int version) async {
+  Future<void> _onCreate(Database db, int version) async {
     await db.execute(
       'CREATE TABLE cashflow(id INTEGER PRIMARY KEY, tanggal STRING, nominal INTEGER, deskripsi TEXT, tipe STRING)',
     );
@@ -40,58 +40,72 @@ class DBHelper {
       'CREATE TABLE user(id INTEGER PRIMARY KEY AUTOINCREMENT, name STRING, username STRING, password STRING)',
     );
 
-    await db.rawInsert(
-      "INSERT INTO user (username, password) VALUES ('user', 'user')",
-    );
+    await db.insert('user', {
+      'username': 'user',
+      'password': 'user',
+    });
+
     print('Database Created');
   }
 
-  Future<Map<String, dynamic>> getLogin(
-      String username, String password) async {
-    var dbClient = await db;
-    List<Map<String, dynamic>> cek = await dbClient!.query(
+  Future<Map<String, dynamic>> getLogin(String username, String password) async {
+    final dbClient = await db;
+    final List<Map<String, dynamic>> result = await dbClient!.query(
       'user',
       where: 'username = ? AND password = ?',
       whereArgs: [username, password],
     );
 
-    if (cek.isNotEmpty) {
-      return cek[0];
-    } else {
-      return {};
+    if (result.isNotEmpty) {
+      return result[0];
     }
+
+    return {};
   }
 
   Future<String> getPassword() async {
-    var dbClient = await db;
-    List<Map> list = await dbClient!.rawQuery(
-      "SELECT password FROM user WHERE username = 'user'",
+    final dbClient = await db;
+    final List<Map<String, dynamic>> list = await dbClient!.query(
+      'user',
+      columns: ['password'],
+      where: 'username = ?',
+      whereArgs: ['user'],
+      limit: 1,
     );
-    String password = list[0]['password'].toString();
-    return password;
+
+    if (list.isEmpty) {
+      return '';
+    }
+
+    return list[0]['password'].toString();
   }
 
   Future<bool> updatePassword(String password) async {
-    var dbClient = await db;
-    int cek = await dbClient!.rawUpdate(
-      "UPDATE user SET password = '$password' WHERE username = 'user'",
+    final dbClient = await db;
+    final int affectedRows = await dbClient!.update(
+      'user',
+      {'password': password},
+      where: 'username = ?',
+      whereArgs: ['user'],
     );
-    return cek > 0 ? true : false;
+
+    return affectedRows > 0;
   }
 
   Future<int> saveCashflow(Cashflow cashflow) async {
-    var dbClient = await db;
-    int cek = await dbClient!.insert('cashflow', cashflow.toMap());
+    final dbClient = await db;
+    final int insertedId = await dbClient!.insert('cashflow', cashflow.toMap());
     print('Cashflow saved');
-    return cek;
+    return insertedId;
   }
 
   Future<List<Cashflow>> getCashflow() async {
-    var dbClient = await db;
-    List<Map> list = await dbClient!.rawQuery("SELECT * FROM cashflow");
-    List<Cashflow> cashflowList = [];
+    final dbClient = await db;
+    final List<Map<String, dynamic>> list = await dbClient!.query('cashflow');
+    final List<Cashflow> cashflowList = [];
+
     for (int i = 0; i < list.length; i++) {
-      var cashflow = Cashflow(
+      final cashflow = Cashflow(
         list[i]['tanggal'],
         list[i]['nominal'],
         list[i]['deskripsi'],
@@ -100,52 +114,45 @@ class DBHelper {
       cashflow.setCashflowId(list[i]['id']);
       cashflowList.add(cashflow);
     }
+
     print(cashflowList);
     return cashflowList;
   }
 
   Future<int> getTotalNominalByType(String type) async {
-    var dbClient = await db;
-    List<Map> list = await dbClient!.rawQuery(
-        "SELECT SUM(nominal) as total_nominal FROM cashflow WHERE tipe = '$type'");
+    final dbClient = await db;
+    final List<Map<String, dynamic>> list = await dbClient!.rawQuery(
+      'SELECT SUM(nominal) as total_nominal FROM cashflow WHERE tipe = ?',
+      [type],
+    );
 
     if (list.isNotEmpty && list[0]['total_nominal'] != null) {
-      int totalNominal = int.parse(list[0]['total_nominal'].toString());
-      return totalNominal;
-    } else {
-      return 0;
+      return int.parse(list[0]['total_nominal'].toString());
     }
+
+    return 0;
   }
 
-  
-
-  // Future<void> ambilNominal() async {
-  //   var dbClient = await db;
-  //   double total = await dbClient.getTo
-  // }
-
-  // Future<void> updateNominal() async {
-  //   var dbClient = await db;
-  //   double total = await dbClient.getTo
-  // }
-
   Future<bool> updateCashflow(Cashflow cashflow) async {
-    var dbClient = await db;
-    int cek = await dbClient!.update(
+    final dbClient = await db;
+    final int affectedRows = await dbClient!.update(
       'cashflow',
       cashflow.toMap(),
-      where: 'id=?',
-      whereArgs: <int>[cashflow.id],
+      where: 'id = ?',
+      whereArgs: [cashflow.id],
     );
-    return cek > 0 ? true : false;
+
+    return affectedRows > 0;
   }
 
   Future<int> deleteCashflow(Cashflow cashflow) async {
-    var dbClient = await db;
-    int cek = await dbClient!.rawDelete(
-      'DELETE FROM cashflow WHERE id= ?',
-      [cashflow.id],
+    final dbClient = await db;
+    final int deletedRows = await dbClient!.delete(
+      'cashflow',
+      where: 'id = ?',
+      whereArgs: [cashflow.id],
     );
-    return cek;
+
+    return deletedRows;
   }
 }
