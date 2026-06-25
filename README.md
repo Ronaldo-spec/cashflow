@@ -1,32 +1,59 @@
 # Cashflow
 
-A project repository for documenting transaction-record handling, category-based data organization, and simple reporting workflow concepts.
+A Flutter mobile application project for local transaction tracking and simple summary reporting.
 
 ---
 
 ## Project Overview
 
-This repository is intended to document a basic cashflow tracking project. The focus is on organizing records, separating transaction categories, and preparing summary information that can be reviewed as part of a programming and data-handling portfolio.
+This project is a mobile app built with Flutter and Dart. It focuses on local record management, category-based organization, and simple summary views.
+
+The app uses SQLite support through `sqflite`, with helper packages for formatting and local storage path handling.
+
+---
+
+## Tech Stack
+
+| Area | Technology |
+|---|---|
+| Mobile Framework | Flutter |
+| Language | Dart |
+| Local Database | sqflite |
+| Formatting | intl |
+| Local Path Handling | path_provider, path |
 
 ---
 
 ## Main Objectives
 
-- Store transaction records.
+- Store records locally.
 - Organize records by category and date.
-- Support basic summary reporting.
-- Demonstrate simple CRUD-oriented application logic.
-- Translate a business record process into a system workflow.
+- Support basic summary views.
+- Demonstrate mobile CRUD-oriented application logic.
+- Translate a simple record process into a mobile workflow.
 
 ---
 
-## Possible Core Features
+## Installation
 
-- Transaction input
-- Category management
-- Date-based filtering
-- Balance or summary calculation
-- Report table or dashboard view
+Clone the repository:
+
+```bash
+git clone https://github.com/Ronaldo-spec/cashflow.git
+cd cashflow
+```
+
+Install dependencies:
+
+```bash
+flutter pub get
+```
+
+Run the app:
+
+```bash
+flutter run
+```
 
 ---
 
@@ -34,27 +61,21 @@ This repository is intended to document a basic cashflow tracking project. The f
 
 This project is useful to demonstrate:
 
-- Data modeling for transaction records
+- Flutter mobile application development
+- Local database usage with `sqflite`
+- Record data modeling
 - CRUD workflow design
-- Reporting-oriented thinking
-- Business process documentation
-- Simple application planning
+- Simple reporting-oriented thinking
 
 ---
 
 ## Future Improvements
 
-- Add setup instructions based on the final technology stack.
 - Add screenshots or demo output.
 - Add sample data.
-- Add reporting examples.
-- Add dashboard preview if available.
-
----
-
-## Status
-
-Project archive / portfolio documentation.
+- Add dashboard preview.
+- Add export feature.
+- Add clearer architecture documentation.
 
 ---
 
